@@ -15,6 +15,16 @@ public class CombinedDie<T, V> implements Dice<T>, Die<V> {
     private List<Die<? extends T>> dice;
 
     /**
+     * Create combined die from roll result.
+     * 
+     * @param 
+     */
+    public CombinedDie(RollResult<T, V> result) {
+        this.combiner = result.getCombiner();
+        this.dice = new ArrayList<>(result.getDice().getDice());
+    }
+
+    /**
      * Create a new combined die.
      * 
      * @param dice The members of the combined dice. 
