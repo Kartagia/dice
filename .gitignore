@@ -1,0 +1,5 @@
+# Visual Studio code
+.vscode
+
+# Maven related ignore
+target
