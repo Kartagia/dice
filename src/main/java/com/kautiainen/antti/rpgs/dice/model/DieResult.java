@@ -47,7 +47,7 @@ public interface DieResult<T> {
             /**
              * The die of the roll.
              */
-            private Die<? extends VALUE> myDie = die;
+            private final Die<? extends VALUE> myDie = die;
 
             /**
              * The value of the die result.
