@@ -1,8 +1,11 @@
 package com.kautiainen.antti.rpgs.dice.model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.stream.Collector;
 
 /**
  * Rerolled die result represents a die results created by rerolling.
@@ -10,6 +13,86 @@ import java.util.function.Function;
  * the result of the reroll.
  */
 public class RerolledDieResult<T> implements DieResult<T> {
+
+    /**
+     * Create a function getting the best of all values.
+     * 
+     * @param <T>        The content type.
+     * @param comparator The comparator of the values.
+     * @return The function returning the best of the values.
+     */
+    public static <T> Function<List<? extends T>, ? extends T> getBestOf(Comparator<? super T> comparator) {
+        return (List<? extends T> list) -> (list.stream().collect(
+                Collector.of(
+                        () -> (new AtomicReference<>()),
+                        (AtomicReference<T> head, T item) -> {
+                            if (head.get() == null || comparator.compare(head.get(), item) < 0) {
+                                head.set(item);
+                            }
+                        },
+                        (AtomicReference<T> head, AtomicReference<T> tail) -> {
+                            T headKey = head.get();
+                            T tailKey = tail.get();
+                            if ((headKey == null && tailKey == null) ||
+                                    tailKey == null
+                                    || (headKey != null && (comparator.compare(headKey, tailKey) < 0))) {
+                                return head;
+                            } else {
+                                return tail;
+                            }
+                        },
+                        AtomicReference::get)));
+    }
+
+    /**
+     * Create a function getting the worst of all values.
+     * 
+     * @param <T>        The content type.
+     * @param comparator The comparator of the values.
+     * @return The function returning the worst of the values.
+     */
+    public static <T> Function<List<? extends T>, ? extends T> getWorstOf(Comparator<? super T> comparator) {
+        return (List<? extends T> list) -> (list.stream().collect(
+                Collector.of(
+                        () -> (new AtomicReference<>()),
+                        (AtomicReference<T> head, T item) -> {
+                            if (head.get() == null || comparator.compare(head.get(), item) < 0) {
+                                head.set(item);
+                            }
+                        },
+                        (AtomicReference<T> head, AtomicReference<T> tail) -> {
+                            T headKey = head.get();
+                            T tailKey = tail.get();
+                            if ((headKey == null && tailKey == null) ||
+                                    headKey == null
+                                    || (tailKey != null && (comparator.compare(headKey, tailKey) > 0))) {
+                                return head;
+                            } else {
+                                return tail;
+                            }
+                        },
+                        AtomicReference::get)));
+    }
+
+    /**
+     * Create function returning best value of the natural order.
+     * 
+     * @param <T> The content type omaprable with itself or its superclass.
+     * @return The funciton returning the largets number on the list.
+     */
+    public static <T extends Comparable<? super T>> Function<List<? extends T>, ? extends T> getBestOf() {
+        return getBestOf(Comparator.naturalOrder());
+    }
+
+    /**
+     * Create function returning worst value of the natural order.
+     * 
+     * @param <T> The content type with natural order.
+     * @return The funciton returning the smallest number on the list.
+     */
+    public static <T extends Comparable<? super T>> Function<List<? extends T>, ? extends T> getWorstOf() {
+        return getWorstOf(Comparator.naturalOrder());
+    }
 
     /**
      * The list of the rerolled values.
