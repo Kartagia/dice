@@ -15,6 +15,24 @@ import java.util.stream.Collector;
 public class RerolledDieResult<T> implements DieResult<T> {
 
     /**
+     * Create a function getting the last element of the list or an undefined value
+     * for an empty list.
+     * 
+     * @param <T> The content type.
+     * @return If the list is empty, an undefined value. Otherwise the last element
+     *         of the list.
+     */
+    public static <T> Function<List<? extends T>, ? extends T> getLastOf() {
+        return (List<? extends T> list) -> {
+            if (list.isEmpty()) {
+                return (T) null;
+            } else {
+                return (T) list.get(list.size() - 1);
+            }
+        };
+    }
+
+    /**
      * Create a function getting the best of all values.
      * 
      * @param <T>        The content type.
