@@ -205,5 +205,4 @@ public interface DiceMechanicFactory<T> {
      * @throws ConfigurationException The factory is not properly configured.
      */
     public DiceMechanics<T> createMechanics() throws ConfigurationException;
-
 }
