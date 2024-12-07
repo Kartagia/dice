@@ -2,6 +2,7 @@ package com.kautiainen.antti.rpgs.dice.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -13,7 +14,10 @@ public interface Die<VALUE> {
     /**
      * Roll the die to get single value.
      */
-    public VALUE roll();
+    default VALUE roll() {
+        List<? extends VALUE> sides = getSides();
+        return sides.get((int) Math.floor(Math.random() * (sides.size())));
+    }
 
     /**
      * Get an immutable roll result.
@@ -34,15 +38,24 @@ public interface Die<VALUE> {
     }
 
     /**
+     * The sides of the die.
+     * 
+     * @return An unmodifiable list of die side.s
+     */
+    public List<? extends VALUE> getSides();
+
+    /**
      * Create a die with given sides.
      * 
      * @param <TYPE> The type of the side value.
      * @param sides  The sides of the die.
      * @return The die with given sides.
+     * @throws IllegalArgumentException The side count was zero or the list was undefined.
      */
-    public static <TYPE> Die<TYPE> of(List<TYPE> sides) {
-
-        return () -> sides.get((int) Math.floor(Math.random() * (sides.size())));
+    public static <TYPE> Die<TYPE> of(List<TYPE> sides) throws IllegalArgumentException {
+        if (sides == null) throw new IllegalArgumentException("Invalid sides of die", new NullPointerException("Undefined sides"));
+        else if (sides.isEmpty())  throw new IllegalArgumentException("Invalid sides of die", new NullPointerException("No sides given"));
+        return () -> Collections.unmodifiableList(sides);
     }
 
     /**
