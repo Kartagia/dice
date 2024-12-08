@@ -10,6 +10,9 @@ import java.util.stream.Collector;
  */
 public class CombinedDie<T, V> implements Dice<T>, Die<V> {
 
+    /**
+     * The list of list creates a list storing values of lists.
+     */
     public static class ListOfList<T> extends ArrayList<List<T>> {
 
         public ListOfList(Collection<? extends List<T>> list) {
@@ -37,7 +40,7 @@ public class CombinedDie<T, V> implements Dice<T>, Die<V> {
             ListOfList<E> result = new ListOfList<>(
                     head.isEmpty() ? values.size() : (values.isEmpty() ? head.size() : head.size() * values.size()));
             if (values.isEmpty()) {
-                result.addAll(head);
+                result.addAll((Collection<List<E>>)head);
             } else if (head.isEmpty()) {
                 List<E> newMember = new ArrayList<>(values);
                 result.add(newMember);
@@ -54,6 +57,22 @@ public class CombinedDie<T, V> implements Dice<T>, Die<V> {
         }
 
         /**
+         * Add all emmbers of the given list to the list of list.
+         * @param added The added lists. 
+         */
+        public void addAll(List<List<? extends T>> added) {
+            for( List<? extends T> newMember: added) {
+                add(new ArrayList<>(newMember));
+            }
+        }
+
+        public void addAll(ListOfList<? extends T> added) {
+            for (List<? extends T> newMember: added) {
+                add(new ArrayList<>(newMember));
+            }
+        }
+
+        /**
          * Cobmine list of list with values.
          * 
          * @param <E>    The type of the list values.
@@ -62,7 +81,7 @@ public class CombinedDie<T, V> implements Dice<T>, Die<V> {
          * @return The list of list containing all combinations of head lists and
          *         values.
          */
-        public static <E> ListOfList<E> combine(ListOfList<E> head, ListOfList<E> tail) {
+        public static <E> ListOfList<E> combine(ListOfList<? extends E> head, ListOfList<? extends E> tail) {
             ListOfList<E> result = new ListOfList<>(
                     head.isEmpty() ? tail.size() : (tail.isEmpty() ? head.size() : head.size() * tail.size()));
             if (tail.isEmpty()) {
@@ -70,8 +89,8 @@ public class CombinedDie<T, V> implements Dice<T>, Die<V> {
             } else if (head.isEmpty()) {
                 result.addAll(tail);
             } else {
-                for (List<E> headSides : head) {
-                    for (List<E> tailSides : tail) {
+                for (List<? extends E> headSides : head) {
+                    for (List<? extends E> tailSides : tail) {
                         List<E> newMember = new ArrayList<>(headSides);
                         newMember.addAll(tailSides);
                         result.add(newMember);
@@ -180,7 +199,7 @@ public class CombinedDie<T, V> implements Dice<T>, Die<V> {
                         }
                     }
                     head.clear();
-                    head.addAll(newSidesResult);
+                    head.addAll((Collection<List<T>>)newSidesResult);
                 },
                 (ListOfList<T> head, ListOfList<T> tail) -> {
                     return ListOfList.combine(head, tail);
