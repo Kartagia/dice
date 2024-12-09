@@ -3,7 +3,7 @@ package com.kautiainen.antti.rpgs.dice.model;
 /**
  * A factory configuration exception.
  */
-public abstract class FactoryConfigurationException extends RuntimeException {
+public class FactoryConfigurationException extends RuntimeException {
 
     /**
      * The invalid configuraiton key.
