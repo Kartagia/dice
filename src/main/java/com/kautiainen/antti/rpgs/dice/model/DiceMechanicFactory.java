@@ -204,5 +204,5 @@ public interface DiceMechanicFactory<T> {
      * @return The new dice mechanics.
      * @throws ConfigurationException The factory is not properly configured.
      */
-    public DiceMechanics<T> createMechanics() throws ConfigurationException;
+    public DiceMechanics<T> createMechanics() throws FactoryConfigurationException;
 }

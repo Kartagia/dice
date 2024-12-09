@@ -27,7 +27,7 @@ public interface DieFactory<T> {
         return Die.of(new java.util.ArrayList<>(sides));
     }
 
-    default Die<T> creatDie(DieResult<? extends T> result) throws IllegalArgumentException {
+    default Die<T> createDie(DieResult<? extends T> result) throws IllegalArgumentException {
         if (result == null) {
             throw new IllegalArgumentException(INVALID_SOURCE_RESULT,
                     new NullPointerException(UNDEFINED_SOURCE_RESULT));

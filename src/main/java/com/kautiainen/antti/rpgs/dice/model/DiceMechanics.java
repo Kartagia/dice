@@ -3,6 +3,8 @@ package com.kautiainen.antti.rpgs.dice.model;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * An interface representing a dice system.
@@ -14,7 +16,16 @@ public interface DiceMechanics<T> {
     /**
      * A roll modifier alters teh roll result.
      */
-    public static interface RollModifier<T, V> {
+    public static interface RollModifier<T, V> extends Function<RollResult<T, V>, RollResult<T, V>> {
+
+        /**
+         * Get the name of the modifier.
+         * 
+         * @return The optional name of the modifier.
+         */
+        default Optional<String> getName() {
+            return Optional.empty();
+        }
 
         /**
          * Modify roll result by the modifier.
@@ -22,6 +33,7 @@ public interface DiceMechanics<T> {
          * @param result The modified roll result.
          * @return The modified roll result.
          */
+        @Override
         public RollResult<T, V> apply(RollResult<T, V> result);
     }
 
