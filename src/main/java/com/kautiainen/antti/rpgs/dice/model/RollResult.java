@@ -53,7 +53,7 @@ public interface RollResult<T, V> extends DieResult<V> {
 
             private final CombinedDie<SIDES, RESULT> die = new CombinedDie<>(dice, combiner);
 
-            private final List<DieResult<SIDES>> results = (rerollable ? die.getRerollableResults() : die.getResults() );
+            private final List<DieResult<SIDES>> results = (rerollable ? die.getRerollableResults() : die.getResults());
 
             @Override
             public Die<? extends RESULT> getDie() {
@@ -76,14 +76,25 @@ public interface RollResult<T, V> extends DieResult<V> {
             }
 
             @Override
-            public RESULT reroll() {
-                if (rerollable) {
-                    // Perform reroll.
-                    return getMembers().stream().map( DieResult::reroll ).collect(getCombiner());
+            public RESULT reroll() throws UnsupportedOperationException {
+                if (isRerollable()) {
+                    if (rerollable) {
+                        // Perform reroll.
+                        return getMembers().stream().map(dieResult -> (dieResult.isRerollable()
+                                ? dieResult.reroll()
+                                : dieResult.getValue())).collect(getCombiner());
+                    } else {
+                        // Throw exception by calling the default implementation throwing an exception.
+                        return RollResult.super.reroll();
+                    }
                 } else {
-                    // Throw exception by calling the super constructor.
                     return RollResult.super.reroll();
                 }
+            }
+
+            @Override
+            public boolean isRerollable() {
+                return rerollable && results.stream().anyMatch(DieResult::isRerollable);
             }
 
         };
@@ -95,9 +106,9 @@ public interface RollResult<T, V> extends DieResult<V> {
      * @param <SIDES>  The type of the die results.
      * @param <RESULT> The result of the die.
      * @param <A>      The accumulator of the combiner.
-     * @param dice      The dice rolled for the result.
-     * @param combiner  The combiner function combining the dice results into roll
-     *                  result.
+     * @param dice     The dice rolled for the result.
+     * @param combiner The combiner function combining the dice results into roll
+     *                 result.
      */
     public static <A, SIDES, RESULT> RollResult<SIDES, RESULT> of(
             Collection<Die<? extends SIDES>> dice,

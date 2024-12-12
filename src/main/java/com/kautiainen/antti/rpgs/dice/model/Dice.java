@@ -49,6 +49,16 @@ public interface Dice<T> {
      * @throws UnsupportedOperationException The rerolling is not supported.
      */
     default List<DieResult<T>> getRerollableResults() throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("Rerolling not supported");
+        return getDice().stream().map( (Die<? extends T> die) -> {
+            DieResult<T> result;
+            try {
+                // Trying to create rerollable result.
+                result = DieResult.createRerollable(die);
+            } catch (UnsupportedOperationException e) {
+                // The die without reroll support is returned as it is.
+                result = DieResult.of(die.getResult());
+            }
+            return result;
+        }).toList();
     }
 }

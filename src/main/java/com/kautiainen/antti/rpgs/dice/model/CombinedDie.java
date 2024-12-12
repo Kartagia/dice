@@ -85,9 +85,14 @@ public class CombinedDie<T, V> implements Dice<T>, Die<V> {
 
     @Override
     public List<DieResult<T>> getRerollableResults() throws UnsupportedOperationException {
-        return getDice().stream().map(Die::getRerollableResult).map(die -> {
-            DieResult<T> result = DieResult.of(die);
-            return result;
+        return getDice().stream().map(die -> {
+            try {
+                DieResult<T> result = DieResult.of(die.getRerollableResult());
+                return result; 
+            } catch(UnsupportedOperationException uoe) {
+                DieResult<T> result = DieResult.of(die.getResult());
+                return result;
+            }
         }).toList();
     }
 
