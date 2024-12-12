@@ -60,14 +60,19 @@ public interface DieResult<T> {
             }
 
             @Override
-            public synchronized VALUE reroll() throws UnsupportedOperationException {
-                this.value = this.myDie.roll();
+            public synchronized VALUE reroll() {
+                this.value = DieResult.super.reroll();
                 return getValue();
             }
 
             @Override
             public Die<? extends VALUE> getDie() {
                 return this.myDie;
+            }
+
+            @Override
+            public final boolean isRerollable() {
+                return true;
             }
         };
     }
@@ -86,7 +91,11 @@ public interface DieResult<T> {
      * @throws UnsupportedOperationException The rerolling is not supported.
      */
     default T reroll() throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("Rerolling not supported");
+        if (this.isRerollable()) {
+            return getDie().roll();
+        } else {
+            throw new UnsupportedOperationException("Rerolling not supported");
+        }
     }
 
     /**
@@ -96,6 +105,14 @@ public interface DieResult<T> {
      */
     public Die<? extends T> getDie();
 
+    /**
+     * Is the current result rerollable.
+     * 
+     * @return True, if and only if the reroll operation is supported.
+     */
+    default boolean isRerollable() {
+        return false;
+    }
 
     /**
      * Create a wrapper of roll result of super class value.
